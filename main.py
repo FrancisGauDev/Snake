@@ -24,6 +24,7 @@ foodY = 0
 background = (0,0,0)
 snakeC = (125,125,125)
 foodC = (255,0,0)
+white = (255,255,255)
 
 #Shortcut version of random int
 def rand(x, y):
@@ -41,12 +42,11 @@ def gameStart():
     #Resetting stats
     score = 0
     state = 0
-    snakeX = [int(gridWidth/2)]
-    snakeY = [int(gridHeight/2)]
-    #foodX = rand(10, gridWidth - 10)
-    #foodY = rand(10, gridHeight - 10)
+    snakeX = [int(gridWidth/2),int(gridWidth/2),int(gridWidth/2)]
+    snakeY = [int(gridHeight/2),int(gridHeight/2),int(gridHeight/2)]
     snakeD = 0
-    snakeL = 1
+    snakeL = 3
+    foodR()
 
     #Colour generation
     snakeC = (0,0,255)
@@ -55,6 +55,12 @@ def gameStart():
 #Everything the game should do every tick
 def gameTick():
     global snakeD, snakeY, snakeX, snakeL, state, gridHeight, gridWidth, score, scale
+    #Moving the rest of the snake's body
+    for x in range(0, snakeL - 1):
+        if x != snakeL:
+            snakeY[snakeL - x - 1] = snakeY[snakeL - x - 2]
+            snakeX[snakeL - x - 1] = snakeX[snakeL - x - 2]
+
     #Moving the snake's head
     if snakeD == 0:
         snakeY[0] -= 1
@@ -65,11 +71,7 @@ def gameTick():
     else:
         snakeX[0] -= 1
     snakeL = snakeL
-    #Moving the rest of the snake's body
-    for x in range(0, snakeL - 1):
-        if x != snakeL:
-            snakeY[snakeL - x - 1] = snakeY[snakeL - x - 2]
-            snakeX[snakeL - x - 1] = snakeX[snakeL - x - 2]
+
     
     #Checking to see if the snake dies
     if snakeX[0] < 0 or  snakeY[0] < 0 or snakeX[0] > gridWidth - 1 or snakeY[0] > gridHeight - 1:
@@ -92,29 +94,40 @@ pygame.display.set_caption('Snaky boi')
 clock = pygame.time.Clock()
 gameStart()
 ticker = 0
+locked = 0
 while state == 0:
     clock.tick(60)
     for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            state = 1
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP and snakeD != 2:
+            if event.key == pygame.K_UP and snakeD != 2 and locked == 0:
                 snakeD = 0
+                locked = 1
             elif event.key == pygame.K_DOWN and snakeD != 0:
                 snakeD = 2
+                locked = 1
             elif event.key == pygame.K_LEFT and snakeD != 1:
                 snakeD = 3
+                locked = 1
             elif event.key == pygame.K_RIGHT and snakeD != 3:
                 snakeD = 1
+                locked = 1
     if(ticker < 7):
         ticker += 1
         continue
     else:
         ticker = 0
-    print(ticker)
+        locked = 0
     gameDisplay.fill(background)
     for x in range(0, snakeL):
-        pygame.draw.rect(gameDisplay,snakeC,(snakeX[x] * scale, snakeY[x] * scale, scale, scale))
+        pygame.draw.rect(gameDisplay,white,(snakeX[x] * scale, snakeY[x] * scale, scale, scale))
+        pygame.draw.rect(gameDisplay,snakeC,(snakeX[x] * scale + 2, snakeY[x] * scale + 2, scale - 4, scale - 4))
     if snakeX[0] == foodX and snakeY[0] == foodY:
         foodR()
-    pygame.draw.rect(gameDisplay,foodC,(foodX * scale, foodY * scale, scale, scale))
+    print(snakeX)
+    print(snakeY)
+    pygame.draw.rect(gameDisplay,white,(foodX * scale, foodY * scale, scale, scale))
+    pygame.draw.rect(gameDisplay,foodC,(foodX * scale + 2, foodY * scale + 2, scale - 4, scale - 4))
     gameTick()
     pygame.display.update()
