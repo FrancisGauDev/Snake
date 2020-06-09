@@ -23,8 +23,10 @@ foodY = 0
 
 background = (0,0,0)
 snakeC = (125,125,125)
-foodC = (255,0,0)
+foodC = (128,0,0)
 white = (255,255,255)
+green = (0,128,0)
+blue = (0,0,128)
 
 #Shortcut version of random int
 def rand(x, y):
@@ -92,11 +94,17 @@ pygame.init()
 gameDisplay = pygame.display.set_mode((displayWidth, displayHeight))
 pygame.display.set_caption('Snaky boi')
 clock = pygame.time.Clock()
+font = pygame.font.Font('freesansbold.ttf', 32)
+text = font.render('Score: ' + str(score), True, green, background)
+textRect = text.get_rect()  
+textRect.center = (int(displayWidth / 2) , 20) 
 gameStart()
 ticker = 0
 locked = 0
 while state == 0:
     clock.tick(60)
+
+    #User input management
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             state = 1
@@ -113,7 +121,8 @@ while state == 0:
             elif event.key == pygame.K_RIGHT and snakeD != 3:
                 snakeD = 1
                 locked = 1
-    if(ticker < 7):
+
+    if(ticker < 6):
         ticker += 1
         continue
     else:
@@ -125,9 +134,11 @@ while state == 0:
         pygame.draw.rect(gameDisplay,snakeC,(snakeX[x] * scale + 2, snakeY[x] * scale + 2, scale - 4, scale - 4))
     if snakeX[0] == foodX and snakeY[0] == foodY:
         foodR()
-    print(snakeX)
-    print(snakeY)
     pygame.draw.rect(gameDisplay,white,(foodX * scale, foodY * scale, scale, scale))
     pygame.draw.rect(gameDisplay,foodC,(foodX * scale + 2, foodY * scale + 2, scale - 4, scale - 4))
+    
     gameTick()
+
+    text = font.render('Score: ' + str(score), True, green, background)
+    gameDisplay.blit(text, textRect) 
     pygame.display.update()
