@@ -36,8 +36,8 @@ def rand(x, y):
 #Food location randomizer
 def foodR():
     global foodX, foodY, gridWidth, gridHeight
-    foodX = rand(0, gridWidth - 1)
-    foodY = rand(0, gridHeight - 1)
+    foodX = rand(1, gridWidth - 2)
+    foodY = rand(3, gridHeight - 2)
 
 #Resetting game back to it's starting position
 def gameStart():
@@ -77,7 +77,7 @@ def gameTick():
 
     
     #Checking to see if the snake dies
-    if snakeX[0] < 0 or  snakeY[0] < 0 or snakeX[0] > gridWidth - 1 or snakeY[0] > gridHeight - 1:
+    if snakeX[0] < 1 or  snakeY[0] < 3 or snakeX[0] > gridWidth - 2 or snakeY[0] > gridHeight - 2:
         state = 1
     for x in range(3,snakeL):
         if snakeX[0] == snakeX[x] and snakeY[0] == snakeY[x]:
@@ -98,11 +98,11 @@ clock = pygame.time.Clock()
 font = pygame.font.Font('freesansbold.ttf', 32)
 text = font.render('Score: ' + str(score), True, green, background)
 textRect = text.get_rect()  
-textRect.center = (int(displayWidth / 2) , 20) 
+textRect.center = (int(displayWidth / 2) , scale)
 gameStart()
 ticker = 0
 locked = 0
-while state == 0:
+while state == 0 :
     clock.tick(60)
 
     #User input management
@@ -122,24 +122,38 @@ while state == 0:
             elif event.key == pygame.K_RIGHT and snakeD != 3 and locked == 0:
                 snakeD = 1
                 locked = 1
-
+    #Framerate control
     if(ticker < 6):
         ticker += 1
         continue
     else:
         ticker = 0
         locked = 0
+
+    #The start of display management 
     gameDisplay.fill(background)
     for x in range(0, snakeL):
         pygame.draw.rect(gameDisplay,white,(snakeX[x] * scale, snakeY[x] * scale, scale, scale))
         pygame.draw.rect(gameDisplay,snakeC,(snakeX[x] * scale + 2, snakeY[x] * scale + 2, scale - 4, scale - 4))
+    
+    #Checking food collision
     if snakeX[0] == foodX and snakeY[0] == foodY:
         foodR()
+    
+    #Drawing the food
     pygame.draw.rect(gameDisplay,white,(foodX * scale, foodY * scale, scale, scale))
     pygame.draw.rect(gameDisplay,foodC,(foodX * scale + 2, foodY * scale + 2, scale - 4, scale - 4))
-    
-    gameTick()
 
+    #Drawing the playing field
+    pygame.draw.line(gameDisplay, white, (scale, scale * 3), (displayWidth - scale, scale * 3))
+    pygame.draw.line(gameDisplay, white, (displayWidth - scale, scale * 3), (displayWidth - scale, displayHeight - scale))
+    pygame.draw.line(gameDisplay, white, (displayWidth - scale, displayHeight - scale), (scale, displayHeight - scale))
+    pygame.draw.line(gameDisplay, white, (scale, displayHeight - scale), (scale, scale * 3))
+
+    #Drawing the score
     text = font.render('Score: ' + str(score), True, green, background)
     gameDisplay.blit(text, textRect) 
+    
+    gameTick()
+    #Updating the display
     pygame.display.update()
