@@ -8,6 +8,7 @@ score = 0
 gridWidth = displayWidth / scale
 gridHeight = displayHeight / scale
 tick = 5
+border = 2
 
 #0 = up
 #1 = right
@@ -112,13 +113,13 @@ while state == 0:
             if event.key == pygame.K_UP and snakeD != 2 and locked == 0:
                 snakeD = 0
                 locked = 1
-            elif event.key == pygame.K_DOWN and snakeD != 0:
+            elif event.key == pygame.K_DOWN and snakeD != 0 and locked == 0:
                 snakeD = 2
                 locked = 1
-            elif event.key == pygame.K_LEFT and snakeD != 1:
+            elif event.key == pygame.K_LEFT and snakeD != 1 and locked == 0:
                 snakeD = 3
                 locked = 1
-            elif event.key == pygame.K_RIGHT and snakeD != 3:
+            elif event.key == pygame.K_RIGHT and snakeD != 3 and locked == 0:
                 snakeD = 1
                 locked = 1
 
