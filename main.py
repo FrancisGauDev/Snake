@@ -28,6 +28,18 @@ foodC = (128,0,0)
 white = (255,255,255)
 green = (0,128,0)
 blue = (0,0,128)
+lPink = (255,102,204)
+
+#Button function
+def button(msg, x, y, w, h, ic, ac, action=None):
+    global gameDisplay
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+
+    if x + w > mouse[0] > x and y + h  > mouse[1] > y:
+        pygame.draw.rect(gameDisplay, ac, (x, y, w, h))
+        if click[0] == 1 and action is not None:
+            action()
 
 #Shortcut version of random int
 def rand(x, y):
@@ -102,13 +114,23 @@ textRect.center = (int(displayWidth / 2) , scale)
 gameStart()
 ticker = 0
 locked = 0
+menu = 0
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+    gameDisplay.fill(background)
+    button("Start", 525, 250, 150, 60, YELLOW, BRIGHT_YELLOW, start_game)
+        
 while state == 0 :
     clock.tick(60)
 
     #User input management
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            state = 1
+                pygame.quit()
+                quit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and snakeD != 2 and locked == 0:
                 snakeD = 0
@@ -128,7 +150,7 @@ while state == 0 :
         continue
     else:
         ticker = 0
-        locked = 0
+        locked = 0 
 
     #The start of display management 
     gameDisplay.fill(background)
