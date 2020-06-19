@@ -19,6 +19,10 @@ snakeX = [0]
 snakeY = [0]
 snakeL = 1
 
+fTick = 0
+nextF = 6
+
+
 foodX = 0
 foodY = 0
 
@@ -29,15 +33,24 @@ white = (255,255,255)
 green = (0,128,0)
 blue = (0,0,128)
 lPink = (255,102,204)
+lPurple = (170, 109, 209)
 
 #Button function
-def button(msg, x, y, w, h, ic, ac, action=None):
+def button(msg, x, y, w, h, ic, ac, pc, action=None):
     global gameDisplay
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
-
+    pygame.draw.rect(gameDisplay, ac, (x, y, w, h))
+    text = font.render(msg, True, ic, ac)
+    textRect = text.get_rect()  
+    textRect.center = (x + w / 2 , y + h / 2)
+    gameDisplay.blit(text, textRect)
     if x + w > mouse[0] > x and y + h  > mouse[1] > y:
-        pygame.draw.rect(gameDisplay, ac, (x, y, w, h))
+        pygame.draw.rect(gameDisplay, pc, (x, y, w, h))
+        text = font.render(msg, True, ic, pc)
+        textRect = text.get_rect()  
+        textRect.center = (x + w / 2 , y + h / 2)
+        gameDisplay.blit(text, textRect)
         if click[0] == 1 and action is not None:
             action()
 
@@ -47,9 +60,10 @@ def rand(x, y):
 
 #Food location randomizer
 def foodR():
-    global foodX, foodY, gridWidth, gridHeight
+    global foodX, foodY, gridWidth, gridHeight, nextF
     foodX = rand(1, gridWidth - 2)
     foodY = rand(3, gridHeight - 2)
+    nextF -= 1
 
 #Resetting game back to it's starting position
 def gameStart():
@@ -66,6 +80,7 @@ def gameStart():
     #Colour generation
     snakeC = (0,0,255)
     foodC = (255,0,0)
+    nextF = 6
 
 #Everything the game should do every tick
 def gameTick():
@@ -98,7 +113,7 @@ def gameTick():
     #Checking collision between the snake and the food
     if snakeX[0] == foodX and snakeY[0] == foodY:
         foodR()
-        score += 1
+        score += 7 - nextF
         snakeL += 1
         snakeY.append(snakeY[-1])
         snakeX.append(snakeX[-1])
@@ -115,14 +130,20 @@ gameStart()
 ticker = 0
 locked = 0
 menu = 0
-while True:
+
+def cont():
+    global menu
+    menu = 1
+
+while menu == 0:
+    clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
     gameDisplay.fill(background)
-    button("Start", 525, 250, 150, 60, YELLOW, BRIGHT_YELLOW, start_game)
-        
+    button("Start", 525, 250, 300, 60, blue, lPink, lPurple, cont)
+    pygame.display.update()
 while state == 0 :
     clock.tick(60)
 
@@ -145,13 +166,18 @@ while state == 0 :
                 snakeD = 1
                 locked = 1
     #Framerate control
-    if(ticker < 6):
+    if(ticker < nextF):
         ticker += 1
         continue
     else:
         ticker = 0
         locked = 0 
-
+    if nextF < 6:
+        if fTick == 50:
+            nextF += 1
+            fTick = 0
+        else:
+            fTick += 1
     #The start of display management 
     gameDisplay.fill(background)
     for x in range(0, snakeL):
