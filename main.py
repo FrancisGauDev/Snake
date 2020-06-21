@@ -43,13 +43,13 @@ def button(msg, x, y, w, h, ic, ac, pc, action=None):
     pygame.draw.rect(gameDisplay, ac, (x, y, w, h))
     text = font.render(msg, True, ic, ac)
     textRect = text.get_rect()  
-    textRect.center = (x + w / 2 , y + h / 2)
+    textRect.center = (int(x + w / 2) , int(y + h / 2))
     gameDisplay.blit(text, textRect)
     if x + w > mouse[0] > x and y + h  > mouse[1] > y:
         pygame.draw.rect(gameDisplay, pc, (x, y, w, h))
         text = font.render(msg, True, ic, pc)
         textRect = text.get_rect()  
-        textRect.center = (x + w / 2 , y + h / 2)
+        textRect.center = (int(x + w / 2) , int(y + h / 2))
         gameDisplay.blit(text, textRect)
         if click[0] == 1 and action is not None:
             action()
@@ -61,13 +61,23 @@ def rand(x, y):
 #Food location randomizer
 def foodR():
     global foodX, foodY, gridWidth, gridHeight, nextF
-    foodX = rand(1, gridWidth - 2)
-    foodY = rand(3, gridHeight - 2)
-    nextF -= 1
+    tempR = rand(0, 8)
+    done = 0
+    if tempR <= 3:
+        while done == 0:
+            foodX = rand(1, gridWidth - 2)
+            foodY = rand(3, gridHeight - 2)
+            done = 1
+            for x in range(len(foodX)):
+                if snakeX[x] == foodX or snakeY[x] == foodY:
+                    done = 0
+                
+    if nextF > 0: 
+        nextF -= 1
 
 #Resetting game back to it's starting position
 def gameStart():
-    global score, state, snakeX, snakeY, foodX, foodY, gridWidth, gridHeight, snakeD, snakeL, snakeC, foodC
+    global score, state, snakeX, snakeY, foodX, foodY, gridWidth, gridHeight, snakeD, snakeL, snakeC, foodC, nextF
     #Resetting stats
     score = 0
     state = 0
@@ -112,8 +122,8 @@ def gameTick():
     
     #Checking collision between the snake and the food
     if snakeX[0] == foodX and snakeY[0] == foodY:
-        foodR()
         score += 7 - nextF
+        foodR()
         snakeL += 1
         snakeY.append(snakeY[-1])
         snakeX.append(snakeX[-1])
@@ -173,7 +183,7 @@ while state == 0 :
         ticker = 0
         locked = 0 
     if nextF < 6:
-        if fTick == 50:
+        if fTick == 100:
             nextF += 1
             fTick = 0
         else:
@@ -201,7 +211,7 @@ while state == 0 :
     #Drawing the score
     text = font.render('Score: ' + str(score), True, green, background)
     gameDisplay.blit(text, textRect) 
-    
+    print(nextF)
     gameTick()
     #Updating the display
     pygame.display.update()
