@@ -56,23 +56,69 @@ def button(msg, x, y, w, h, ic, ac, pc, action=None):
 
 #Shortcut version of random int
 def rand(x, y):
-    return random.randint(x, y)
+    if y < x:
+        return random.randint(y, x)
+    else:
+        return random.randint(x, y)
 
 #Food location randomizer
 def foodR():
-    global foodX, foodY, gridWidth, gridHeight, nextF
+    global foodX, foodY, gridWidth, gridHeight, nextF, snakeX, snakeY
+    staX = 1
+    staY = 3
+    midX = int(gridWidth / 2)
+    midY = int(gridHeight / 2 + 2)
+    endX = int(gridWidth - 2)
+    endY = int(gridHeight - 2)
+
+    X1 = 0
+    X2 = 0
+    Y1 = 0
+    Y2 = 0
+
+    if snakeX[0] >= midX:
+        staX = int(gridWidth - 2)
+        endX = 1
+    if snakeY[0] >= midY:
+        staY = int(gridHeight - 2)
+        endY = 3
+
     tempR = rand(0, 8)
-    done = 0
+    done = 1
     if tempR <= 3:
-        while done == 0:
-            foodX = rand(1, gridWidth - 2)
-            foodY = rand(3, gridHeight - 2)
-            done = 1
-            for x in range(len(foodX)):
-                if snakeX[x] == foodX or snakeY[x] == foodY:
-                    done = 0
-                
-    if nextF > 0: 
+        X1 = staX
+        X2 = midX
+        Y1 = staY
+        Y2 = midY
+    elif tempR <= 5:
+        X1 = staX
+        X2 = midX
+        Y1 = midY
+        Y2 = endY
+    elif tempR <= 7:
+        X1 = midX
+        X2 = endX
+        Y1 = staY
+        Y2 = midY
+    else:
+        X1 = midX
+        X2 = endX
+        Y1 = midY
+        Y2 = endY
+    while done == 1:
+        foodX = rand(X1, X2)
+        foodY = rand(Y1, Y2)
+        done = 0
+        for x in range(snakeL):
+            if snakeX[x] == foodX and snakeY[x] == foodY:
+                done = 1
+                print("Overlap")   
+        print(tempR)
+        print("foodX ", foodX)
+        print("FoodY ", foodY)
+        print(str(X1) + " " + str(X2))
+        print(str(Y1) + " " + str(Y2))
+    if nextF > 1: 
         nextF -= 1
 
 #Resetting game back to it's starting position
@@ -85,8 +131,14 @@ def gameStart():
     snakeY = [int(gridHeight/2),int(gridHeight/2),int(gridHeight/2)]
     snakeD = 0
     snakeL = 3
-    foodR()
-
+    done = 1
+    while done == 1:
+        foodX = rand(1, gridWidth - 2)
+        foodY = rand(3, gridHeight - 2)
+        done = 0
+        for x in range(snakeL):
+            if snakeX[x] == foodX and snakeY[x] == foodX:
+                done = 1
     #Colour generation
     snakeC = (0,0,255)
     foodC = (255,0,0)
@@ -211,7 +263,6 @@ while state == 0 :
     #Drawing the score
     text = font.render('Score: ' + str(score), True, green, background)
     gameDisplay.blit(text, textRect) 
-    print(nextF)
     gameTick()
     #Updating the display
     pygame.display.update()
