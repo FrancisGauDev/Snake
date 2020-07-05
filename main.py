@@ -9,6 +9,7 @@ gridWidth = displayWidth / scale
 gridHeight = displayHeight / scale
 tick = 5
 border = 2
+level = 1
 
 #0 = up
 #1 = right
@@ -83,19 +84,19 @@ def foodR():
         staY = int(gridHeight - 2)
         endY = 3
 
-    tempR = rand(0, 8)
+    tempR = rand(0, 10)
     done = 1
-    if tempR <= 3:
+    if tempR <= 5:
         X1 = staX
         X2 = midX
         Y1 = staY
         Y2 = midY
-    elif tempR <= 5:
+    elif tempR <= 7:
         X1 = staX
         X2 = midX
         Y1 = midY
         Y2 = endY
-    elif tempR <= 7:
+    elif tempR <= 9:
         X1 = midX
         X2 = endX
         Y1 = staY
@@ -112,12 +113,6 @@ def foodR():
         for x in range(snakeL):
             if snakeX[x] == foodX and snakeY[x] == foodY:
                 done = 1
-                print("Overlap")   
-        print(tempR)
-        print("foodX ", foodX)
-        print("FoodY ", foodY)
-        print(str(X1) + " " + str(X2))
-        print(str(Y1) + " " + str(Y2))
     if nextF > 1: 
         nextF -= 1
 
@@ -146,7 +141,7 @@ def gameStart():
 
 #Everything the game should do every tick
 def gameTick():
-    global snakeD, snakeY, snakeX, snakeL, state, gridHeight, gridWidth, score, scale
+    global snakeD, snakeY, snakeX, snakeL, state, gridHeight, gridWidth, score, scale, level
     #Moving the rest of the snake's body
     for x in range(0, snakeL - 1):
         if x != snakeL:
@@ -174,7 +169,7 @@ def gameTick():
     
     #Checking collision between the snake and the food
     if snakeX[0] == foodX and snakeY[0] == foodY:
-        score += 7 - nextF
+        score += level + 6 - nextF
         foodR()
         snakeL += 1
         snakeY.append(snakeY[-1])
@@ -193,6 +188,7 @@ ticker = 0
 locked = 0
 menu = 0
 
+
 def cont():
     global menu
     menu = 1
@@ -200,12 +196,14 @@ def cont():
 while menu == 0:
     clock.tick(60)
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
+        if event.type == pygame.QUIT:  
             quit()
     gameDisplay.fill(background)
     button("Start", 525, 250, 300, 60, blue, lPink, lPurple, cont)
     pygame.display.update()
+
+
+
 while state == 0 :
     clock.tick(60)
 
@@ -266,3 +264,5 @@ while state == 0 :
     gameTick()
     #Updating the display
     pygame.display.update()
+
+
